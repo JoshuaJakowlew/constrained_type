@@ -4,12 +4,11 @@
 #include <optional>
 #include <concepts>
 
-
-template <typename T, std::predicate<T> auto... Constraints>
-class constrained_type
+template <typename T, typename Optional, std::predicate<T> auto... Constraints>
+class basic_constrained_type
 {
 public:
-    constexpr constrained_type(auto&&... args)
+    constexpr basic_constrained_type(auto&&... args)
     {
         auto value = T{std::forward<decltype(args)>(args)...};
         bool satisfied = (Constraints(std::move(value)) & ...);
@@ -51,11 +50,15 @@ public:
         return static_cast<bool>(_value);
     }
 private:
-    std::optional<T> _value;
+    Optional _value;
 };
+
+template <typename T, std::predicate<T> auto... Constraints>
+using constrained_type = basic_constrained_type<T, std::optional<T>, Constraints...>;
 
 int main()
 {
+
     // constexpr auto x = constrained_type<int,
     //     [](auto x) { return x % 2 == 0; },
     //     [](auto x) { return x != 0; }
