@@ -31,13 +31,13 @@ public:
     template<class U>
     [[nodiscard]] constexpr T value_or( U&& default_value ) const &
     {
-        return _value.value_or(std::forward<U>(default_value));
+        return static_cast<bool>(_value) ? _value.value() : default_value;
     }
 
     template<class U>
     [[nodiscard]] constexpr T value_or( U&& default_value ) &&
     {
-        return _value.value_or(std::forward<U>(default_value));
+        return static_cast<bool>(_value) ? _value.value() : default_value;
     }
 
     [[nodiscard]] constexpr explicit operator bool() const noexcept
