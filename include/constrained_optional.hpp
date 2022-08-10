@@ -17,7 +17,7 @@ namespace st
         constexpr basic_constrained_optional(auto&&... args)
         {
             auto value = T{std::forward<decltype(args)>(args)...};
-            bool satisfied = (Constraints(std::move(value)) && ...);
+            bool satisfied = (Constraints(value) && ...);
             if (satisfied)
             {
                 _value = std::move(value);

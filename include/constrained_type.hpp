@@ -10,7 +10,7 @@ namespace st
         constexpr constrained_type(auto&&... args)
             : _value{std::forward<decltype(args)>(args)...}
         {
-            bool satisfied = (Constraints(std::move(_value)) && ...);
+            bool satisfied = (Constraints(_value) && ...);
             if (!satisfied)
             {
                 throw std::logic_error{"Constraints not satisfied"};
