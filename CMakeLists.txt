@@ -1,11 +1,13 @@
 cmake_minimum_required(VERSION 3.22)
 
-project(constrained VERSION 0.1.0 LANGUAGES CXX)
+project(constrained_type VERSION 0.1.0 LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 20)
+add_library(${PROJECT_NAME} INTERFACE)
 
-add_executable(${PROJECT_NAME} ./main.cpp)
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    CXX_STANDARD 20
+)
 
-target_include_directories(${PROJECT_NAME} PRIVATE
+target_include_directories(${PROJECT_NAME} INTERFACE
     ./include
 )
