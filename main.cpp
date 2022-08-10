@@ -1,91 +1,59 @@
 #include <iostream>
+#include <vector>
 #include <string>
 #include <tuple>
-#include <optional>
-#include <concepts>
 #include <memory>
 
-template <typename Optional, typename T>
-concept optional = std::constructible_from<T> && requires (Optional opt)
+#include <constrained_type.hpp>
+
+using namespace st;
+
+// https://t.me/supapro/1138005
+// Read all the thread
+constexpr auto non_empty_constraint()
 {
-    opt.value();
-    static_cast<bool>(opt);
-};
+    return [](auto&& vec) {
+        return !vec.empty();
+    };
+}
 
-template <typename T, optional<T> Optional, std::predicate<T> auto... Constraints>
-class basic_constrained_type
+template <typename T>
+using non_empty = constrained_type<std::vector<T>,
+    non_empty_constraint()
+>;
+
+using hello_str = constrained_type<std::string,
+    [](auto&& x) { return !x.empty(); },
+    [](auto&& x) { return x.starts_with("Hello"); }
+>;
+
+using even_not_null_int = constrained_type<int,
+    [](auto&& x) { return x     != 0; },
+    [](auto&& x) { return x % 2 == 0; }
+>;
+
+template <typename T>
+T foo(non_empty<T> && vec)
 {
-public:
-    constexpr basic_constrained_type(auto&&... args)
-    {
-        auto value = T{std::forward<decltype(args)>(args)...};
-        bool satisfied = (Constraints(std::move(value)) && ...);
-        if (satisfied)
-        {
-            _value = std::move(value);
-        }
-    }
-
-    [[nodiscard]] constexpr auto value() const & -> T const &
-    {
-        return _value.value();
-    }
-
-    [[nodiscard]] constexpr auto value() const && -> T const &&
-    {
-        return _value.value();
-    }
-
-    [[nodiscard]] constexpr auto operator*() const & noexcept -> T const &
-    {
-        return value();
-    }
-
-    [[nodiscard]] constexpr auto operator*() const && noexcept -> T const &&
-    {
-        return value();
-    }
-
-    template<class U>
-    [[nodiscard]] constexpr T value_or( U&& default_value ) const &
-    {
-        return static_cast<bool>(_value) ? _value.value() : default_value;
-    }
-
-    template<class U>
-    [[nodiscard]] constexpr T value_or( U&& default_value ) &&
-    {
-        return static_cast<bool>(_value) ? _value.value() : default_value;
-    }
-
-    [[nodiscard]] constexpr explicit operator bool() const noexcept
-    {
-        return static_cast<bool>(_value);
-    }
-
-    [[nodiscard]] constexpr auto has_value() const noexcept -> bool
-    {
-        return static_cast<bool>(_value);
-    }
-private:
-    Optional _value;
-};
-
-template <typename T, std::predicate<T> auto... Constraints>
-using constrained_type = basic_constrained_type<T, std::optional<T>, Constraints...>;
+    return vec.value()[0];
+}
 
 int main()
 {
-    using hello_str = constrained_type<std::string,
-        [](auto&& x) { return !x.empty(); },
-        [](auto&& x) { return x.starts_with("Hello"); }
-    >;
-
     auto x = hello_str{"!!!Hello world!!!"};
     auto y = hello_str{"Hello world"};
 
-    x = y;
-
     std::cout << x.value_or("Ooops") << std::endl;
-    std::cout << *y << std::endl;
+    std::cout << y.value() << std::endl;
+
+    auto z = non_empty<int>{1, 2, 3, 4};
+    std::cout << foo(std::move(z)) << std::endl;
+
+    // Compile time constraints
+    constexpr auto i1 = even_not_null_int{0};
+    constexpr auto i2 = even_not_null_int{1};
+    constexpr auto i3 = even_not_null_int{2};
+    std::cout << i1.value_or(-1) << std::endl;
+    std::cout << i2.value_or(-1) << std::endl;
+    std::cout << i3.value_or(-1) << std::endl;
 }
