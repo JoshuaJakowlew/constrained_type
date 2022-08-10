@@ -8,54 +8,67 @@
 
 using namespace st;
 
+// Non-empty vector constraint
+
 // https://t.me/supapro/1138005
 // Read all the thread
-// constexpr auto non_empty_constraint()
-// {
-//     return [](auto&& vec) {
-//         return !vec.empty();
-//     };
-// }
+constexpr auto non_empty_constraint()
+{
+    return [](auto&& vec) {
+        return !vec.empty();
+    };
+}
 
-// template <typename T>
-// using non_empty = constrained_type<std::vector<T>,
-//     non_empty_constraint()
-// >;
+template <typename T>
+using non_empty = constrained_type<std::vector<T>,
+    non_empty_constraint()
+>;
+
+// Safe head function
+template <typename T>
+std::optional<T> head(non_empty<T> && vec)
+{
+    if (vec)
+        return (*vec)[0];
+    return std::nullopt;
+}
+
+// String, starting with "Hello" constraint
 
 using hello_str = constrained_type<std::string,
     [](auto&& x) { return x.starts_with("Hello"); }
 >;
 
-// using even_not_null_int = constrained_type<int,
-//     [](auto&& x) { return x     != 0; },
-//     [](auto&& x) { return x % 2 == 0; }
-// >;
+// Event int which can't be null constraint
 
-// template <typename T>
-// T foo(non_empty<T> && vec)
-// {
-//     return vec.value()[0];
-// }
+using even_not_null_int = constrained_type<int,
+    [](auto&& x) { return x     != 0; },
+    [](auto&& x) { return x % 2 == 0; }
+>;
 
 int main()
 {
-    auto x = hello_str{"!!!Hello world!!!"};
-    auto y = hello_str{"Hello world"};
+    auto v1 = non_empty<int>{};
+    auto v2 = non_empty<std::string>{"A", "B", "C", "D"};
 
-    x = std::move(y);
-    y = x;
+    std::cout << "\n[non_empty<T>]\n";
+    std::cout << head(std::move(v1)).value_or(-1) << std::endl;
+    std::cout << head(std::move(v2)).value_or("Ooops") << std::endl;
 
-    std::cout << x.value_or("Ooops x") << std::endl;
-    std::cout << y.value_or("Ooops y") << std::endl;
+    auto s1 = hello_str{"!!!Hello world!!!"};
+    auto s2 = hello_str{"Hello world"};
 
-    // auto v1 = non_empty<int>{1, 2, 3, 4};
-    // std::cout << foo(std::move(v1)) << std::endl;
+    std::cout << "\n[hello_str]\n";
+    std::cout << s1.value_or("Ooops") << std::endl;
+    std::cout << s2.value_or("Ooops") << std::endl;
 
     // Compile time constraints
-    // constexpr auto i1 = even_not_null_int{0};
-    // constexpr auto i2 = even_not_null_int{1};
-    // constexpr auto i3 = even_not_null_int{2};
-    // std::cout << i1.value_or(-1) << std::endl;
-    // std::cout << i2.value_or(-1) << std::endl;
-    // std::cout << i3.value_or(-1) << std::endl;
+    constexpr auto i1 = even_not_null_int{0};
+    constexpr auto i2 = even_not_null_int{1};
+    constexpr auto i3 = even_not_null_int{2};
+    
+    std::cout << "\n[even_not_null_int]\n";
+    std::cout << i1.value_or(-1) << std::endl;
+    std::cout << i2.value_or(-1) << std::endl;
+    std::cout << i3.value_or(-1) << std::endl;
 }
