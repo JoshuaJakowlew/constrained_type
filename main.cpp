@@ -4,7 +4,7 @@
 #include <tuple>
 #include <memory>
 
-#include <constrained_type.hpp>
+#include <constrained_optional.hpp>
 
 using namespace st;
 
@@ -20,7 +20,7 @@ constexpr auto non_empty_constraint()
 }
 
 template <typename T>
-using non_empty = constrained_type<std::vector<T>,
+using non_empty = constrained_optional<std::vector<T>,
     non_empty_constraint()
 >;
 
@@ -35,13 +35,13 @@ std::optional<T> head(non_empty<T> && vec)
 
 // String, starting with "Hello" constraint
 
-using hello_str = constrained_type<std::string,
+using hello_str = constrained_optional<std::string,
     [](auto&& x) { return x.starts_with("Hello"); }
 >;
 
 // Event int which can't be null constraint
 
-using even_not_null_int = constrained_type<int,
+using even_not_null_int = constrained_optional<int,
     [](auto&& x) { return x     != 0; },
     [](auto&& x) { return x % 2 == 0; }
 >;

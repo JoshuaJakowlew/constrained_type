@@ -11,10 +11,10 @@ namespace st
     };
 
     template <typename T, optional<T> Optional, std::predicate<T> auto... Constraints>
-    class basic_constrained_type
+    class basic_constrained_optional
     {
     public:
-        constexpr basic_constrained_type(auto&&... args)
+        constexpr basic_constrained_optional(auto&&... args)
         {
             auto value = T{std::forward<decltype(args)>(args)...};
             bool satisfied = (Constraints(std::move(value)) && ...);
@@ -24,16 +24,16 @@ namespace st
             }
         }
 
-        constexpr basic_constrained_type(basic_constrained_type const & other) = default;
+        constexpr basic_constrained_optional(basic_constrained_optional const & other) = default;
 
-        constexpr basic_constrained_type(basic_constrained_type&& other) noexcept
+        constexpr basic_constrained_optional(basic_constrained_optional&& other) noexcept
         {
             swap(_value, other._value);
         }
 
-        constexpr basic_constrained_type & operator=(basic_constrained_type const & other) = default;
+        constexpr basic_constrained_optional & operator=(basic_constrained_optional const & other) = default;
 
-        constexpr basic_constrained_type & operator=(basic_constrained_type&& other) noexcept
+        constexpr basic_constrained_optional & operator=(basic_constrained_optional&& other) noexcept
         {
             swap(_value, other._value);
             return *this;
@@ -85,5 +85,5 @@ namespace st
     };
 
     template <typename T, std::predicate<T> auto... Constraints>
-    using constrained_type = basic_constrained_type<T, std::optional<T>, Constraints...>;
+    using constrained_optional = basic_constrained_optional<T, std::optional<T>, Constraints...>;
 } // namespace st
