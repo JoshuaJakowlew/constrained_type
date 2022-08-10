@@ -37,6 +37,11 @@ namespace st
             return _value;
         }
 
+        [[nodiscard]] constexpr auto value() && -> T &&
+        {
+            return std::move(_value).value(); 
+        }
+
         [[nodiscard]] constexpr auto value() const && -> T const &&
         {
             return _value;
