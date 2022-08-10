@@ -76,17 +76,16 @@ using constrained_type = basic_constrained_type<T, std::optional<T>, Constraints
 
 int main()
 {
-    auto x = constrained_type<std::string,
+    using hello_str = constrained_type<std::string,
         [](auto&& x) { return !x.empty(); },
         [](auto&& x) { return x.starts_with("Hello"); }
-    >{"!!!Hello world!!!"};
+    >;
 
-    auto y = constrained_type<std::string,
-        [](auto&& x) { return !x.empty(); },
-        [](auto&& x) { return x.starts_with("Hello"); }
-    >{"Hello world"};
+    auto x = hello_str{"!!!Hello world!!!"};
+    auto y = hello_str{"Hello world"};
+
+    x = y;
 
     std::cout << x.value_or("Ooops") << std::endl;
     std::cout << *y << std::endl;
-    // x = y;
 }
