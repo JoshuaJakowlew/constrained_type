@@ -5,6 +5,7 @@
 #include <memory>
 
 #include <constrained_optional.hpp>
+#include <constrained_type.hpp>
 
 using namespace st;
 
@@ -46,8 +47,10 @@ using even_not_null_int = constrained_optional<int,
     [](auto&& x) { return x % 2 == 0; }
 >;
 
-int main()
+void test_constrained_optionals()
 {
+    std::cout << "\n === [constrained optionals] === \n";
+
     auto v1 = non_empty<int>{};
     auto v2 = non_empty<std::string>{"A", "B", "C", "D"};
 
@@ -71,4 +74,36 @@ int main()
     std::cout << i1.value_or(-1) << std::endl;
     std::cout << i2.value_or(-1) << std::endl;
     std::cout << i3.value_or(-1) << std::endl;
+}
+
+template <typename T>
+using non_empty_t = constrained_type<std::vector<T>,
+    non_empty_constraint()
+>;
+
+template <typename T>
+T safe_head(non_empty_t<T> && vec)
+{
+    return (*vec)[0];
+}
+
+void test_constrained_types()
+{
+    std::cout << "\n === [constrained optionals] === \n";
+
+    auto v1 = non_empty_t<int>{1};
+    auto v2 = non_empty_t<std::string>{"A", "B", "C", "D"};
+
+    std::vector<int> v3 = v1;
+    v3[0] = 42;
+
+    std::cout << "\n[non_empty_t<T>]\n";
+    std::cout << safe_head(std::move(v1)) << std::endl;
+    std::cout << safe_head(std::move(v2)) << std::endl;
+}
+
+int main()
+{
+    test_constrained_optionals();
+    test_constrained_types();
 }
