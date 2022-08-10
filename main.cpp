@@ -3,6 +3,7 @@
 #include <string>
 #include <tuple>
 #include <memory>
+#include <cmath>
 
 #include <constrained_optional.hpp>
 #include <constrained_type.hpp>
@@ -87,6 +88,23 @@ T safe_head(non_empty_t<T> && vec)
     return (*vec)[0];
 }
 
+constexpr auto non_negative_constraint()
+{
+    return [](auto&& x) { return x >= 0; };
+}
+
+template <typename T>
+using non_negative = constrained_type<T,
+    non_negative_constraint()
+>;
+
+template <typename T>
+    requires std::floating_point<T> || std::integral<T>
+auto safe_sqrt(non_negative<T> x)
+{
+    return std::sqrt(*x);
+}
+
 void test_constrained_types()
 {
     std::cout << "\n === [constrained optionals] === \n";
@@ -100,6 +118,8 @@ void test_constrained_types()
     std::cout << "\n[non_empty_t<T>]\n";
     std::cout << safe_head(std::move(v1)) << std::endl;
     std::cout << safe_head(std::move(v2)) << std::endl;
+
+    std::cout << safe_sqrt<int>(25) << std::endl;
 }
 
 int main()
