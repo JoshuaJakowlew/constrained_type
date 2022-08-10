@@ -24,6 +24,21 @@ namespace st
             }
         }
 
+        constexpr basic_constrained_type(basic_constrained_type const & other) = default;
+
+        constexpr basic_constrained_type(basic_constrained_type&& other) noexcept
+        {
+            swap(_value, other._value);
+        }
+
+        constexpr basic_constrained_type & operator=(basic_constrained_type const & other) = default;
+
+        constexpr basic_constrained_type & operator=(basic_constrained_type&& other) noexcept
+        {
+            swap(_value, other._value);
+            return *this;
+        }
+
         [[nodiscard]] constexpr auto value() const & -> T const &
         {
             return _value.value();
