@@ -19,7 +19,7 @@ public:
     constexpr basic_constrained_type(auto&&... args)
     {
         auto value = T{std::forward<decltype(args)>(args)...};
-        bool satisfied = (Constraints(std::move(value)) & ...);
+        bool satisfied = (Constraints(std::move(value)) && ...);
         if (satisfied)
         {
             _value = std::move(value);
