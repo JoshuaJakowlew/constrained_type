@@ -36,6 +36,16 @@ public:
         return _value.value();
     }
 
+    [[nodiscard]] constexpr auto operator*() const & noexcept -> T const &
+    {
+        return value();
+    }
+
+    [[nodiscard]] constexpr auto operator*() const && noexcept -> T const &&
+    {
+        return value();
+    }
+
     template<class U>
     [[nodiscard]] constexpr T value_or( U&& default_value ) const &
     {
@@ -66,31 +76,17 @@ using constrained_type = basic_constrained_type<T, std::optional<T>, Constraints
 
 int main()
 {
-
-    // constexpr auto x = constrained_type<int,
-    //     [](auto x) { return x % 2 == 0; },
-    //     [](auto x) { return x != 0; }
-    // >{1488};
+    auto x = constrained_type<std::string,
+        [](auto&& x) { return !x.empty(); },
+        [](auto&& x) { return x.starts_with("Hello"); }
+    >{"!!!Hello world!!!"};
 
     auto y = constrained_type<std::string,
         [](auto&& x) { return !x.empty(); },
         [](auto&& x) { return x.starts_with("Hello"); }
     >{"Hello world"};
 
-    struct foo
-    {
-        foo() { std::puts("Create"); }
-        // foo(foo&&) noexcept { std::puts("Move"); }
-        foo(foo const &) { std::puts("Copy"); }
-        
-        // foo operator=(foo&&) noexcept { std::puts("Move"); }
-        // foo operator=(foo const&) noexcept { std::puts("Move"); }
-    };
-
-    auto z = constrained_type<foo,
-        [](auto&& x) { return true; }
-    >{};
-
-    // std::cout << x.value_or(-1) << std::endl;
-    std::cout << y.value_or("Nope") << std::endl;
+    std::cout << x.value_or("Ooops") << std::endl;
+    std::cout << *y << std::endl;
+    // x = y;
 }
