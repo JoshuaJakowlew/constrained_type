@@ -3,8 +3,16 @@
 #include <tuple>
 #include <optional>
 #include <concepts>
+#include <memory>
 
-template <typename T, typename Optional, std::predicate<T> auto... Constraints>
+template <typename Optional, typename T>
+concept optional = std::constructible_from<T> && requires (Optional opt)
+{
+    opt.value();
+    static_cast<bool>(opt);
+};
+
+template <typename T, optional<T> Optional, std::predicate<T> auto... Constraints>
 class basic_constrained_type
 {
 public:
@@ -68,6 +76,20 @@ int main()
         [](auto&& x) { return !x.empty(); },
         [](auto&& x) { return x.starts_with("Hello"); }
     >{"Hello world"};
+
+    struct foo
+    {
+        foo() { std::puts("Create"); }
+        // foo(foo&&) noexcept { std::puts("Move"); }
+        foo(foo const &) { std::puts("Copy"); }
+        
+        // foo operator=(foo&&) noexcept { std::puts("Move"); }
+        // foo operator=(foo const&) noexcept { std::puts("Move"); }
+    };
+
+    auto z = constrained_type<foo,
+        [](auto&& x) { return true; }
+    >{};
 
     // std::cout << x.value_or(-1) << std::endl;
     std::cout << y.value_or("Nope") << std::endl;
