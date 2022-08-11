@@ -85,6 +85,11 @@ namespace ct
         {
             return static_cast<bool>(_value);
         }
+
+        [[nodiscard]] constexpr operator Optional() const noexcept
+        {
+            return _value;
+        }
     private:
         Optional _value;
     };
