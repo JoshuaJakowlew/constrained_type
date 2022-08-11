@@ -1,7 +1,7 @@
 #include <concepts>
 #include <stdexcept>
 
-namespace st
+namespace ct
 {
     template <typename T, std::predicate<T> auto... Constraints>
     class constrained_type
@@ -64,4 +64,4 @@ namespace st
     private:
         T _value;
     };
-} // namespace st
+} // namespace ct

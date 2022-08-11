@@ -1,7 +1,7 @@
 #include <concepts>
 #include <optional>
 
-namespace st
+namespace ct
 {
     template <typename Optional, typename T>
     concept optional = std::constructible_from<T> && requires (Optional opt)
@@ -91,4 +91,4 @@ namespace st
 
     template <typename T, std::predicate<T> auto... Constraints>
     using constrained_optional = basic_constrained_optional<T, std::optional<T>, Constraints...>;
-} // namespace st
+} // namespace ct
