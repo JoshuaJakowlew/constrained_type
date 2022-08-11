@@ -14,6 +14,8 @@ namespace ct
     class basic_constrained_optional
     {
     public:
+        using optional_t = Optional;
+
         constexpr basic_constrained_optional(auto&&... args)
         {
             auto value = T{std::forward<decltype(args)>(args)...};
